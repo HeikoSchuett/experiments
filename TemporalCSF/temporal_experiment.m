@@ -12,7 +12,8 @@ function sampling_struct=temporal_experiment(ProbandName,f,typeTemporal,distance
 % n_block      number of trials with fixed stimulus intensity (default=1)
 %
 % please check that framerate = 120hz!
- 
+% To convert the data of this experiment into database format use:
+% convert_database('data','output.csv',{'frequency','pedestal contrast','sizeX','sizeY','temporal condition','phase','test contrast','true position','response','RT'})
 
 addpath('adaptive_sampling')
 rng('shuffle');
@@ -243,7 +244,7 @@ sampling_struct.distance = distance;
 sampling_struct.typeTemporal = typeTemporal;
 try
     if ~exist('results','var')
-        results = [f,contrast,size0,NaN,NaN,NaN,NaN,NaN];
+        results = [f,contrast,size0,typeTemporal,NaN,NaN,NaN,NaN,NaN,NaN];
         results = repmat(results,Ntrials,1);
         firstTrial=1;
     else
@@ -259,20 +260,21 @@ try
         if n_block == 1 ||  mod(itrial,n_block)==1 % update contrast only every Nblockth trial
             c = choose_adaptive_sampling(sampling_struct,adaptiveType);
         end
-        results(itrial,6) = c;
+        results(itrial,11) = now;
+        results(itrial,7) = c;
         iphase = randi(length(phase));
-        results(itrial,5) = phase(iphase);
+        results(itrial,6) = phase(iphase);
         pos    = randi(2);
-        results(itrial,7) = pos;
+        results(itrial,8) = pos;
         response = trial(c,iphase,pos);
         % Save the responses
         [press, rt] = response.get_presses('first');
         if ~isnan(press)
-            results(itrial,8) = press;
-            results(itrial,9) = rt;
+            results(itrial,9) = press;
+            results(itrial,10) = rt;
         else
-            results(itrial,8) = NaN;
             results(itrial,9) = NaN;
+            results(itrial,10) = NaN;
         end
         % update sampling_struct
         correct = press == pos;
@@ -283,7 +285,7 @@ try
         end
         if mod(itrial,n_feedback)==0
             save_data();
-            correct=results(:,7)==results(:,8);
+            correct=results(:,8)==results(:,9);
             n_correct_total=sum(correct);
             n_total=itrial;
             n_correct_last=sum(correct((itrial-n_feedback+1):itrial));
@@ -295,7 +297,7 @@ try
         
     end
     save_data();
-    correct=results(:,7)==results(:,8);
+    correct=results(:,8)==results(:,9);
     n_correct_total=sum(correct);
     n_total=itrial;
     win.pause_trial(list_stop,[num2str(itrial), ' trials passed out of ', num2str(size(results,1)),...
@@ -422,9 +424,9 @@ end
             fname = ['test' '_' num2str(typeTemporal) '_' sprintf('%.2f',f) '_' fileTimestamp '.mat'];
         end
         if exist('results','var')
-            save(fullfile(datadir, fname), 'sampling_struct','results');
+            save(fullfile(datadir, fname), 'sampling_struct','results','ProbandName');
         else
-            save(fullfile(datadir, fname), 'sampling_struct');
+            save(fullfile(datadir, fname), 'sampling_struct','ProbandName');
         end
         fprintf('Data saved in: %s\n', fname);
     end

@@ -1,4 +1,4 @@
-function sampling_struct=temporal_experiment(ProbandName,f,typeTemporal,distance,Ntrials,contrast,n_block)
+function sampling_struct=temporal_experimentOffice(ProbandName,f,typeTemporal,distance,Ntrials,contrast,n_block)
 % function sampling_struct=temporal_experiment(ProbandName,f,typeTemporal,distance,Ntrials,contrast,n_block)
 % this function runs a condition of the experiment with temporal variations
 %
@@ -169,7 +169,8 @@ clut(clut<0)= 0;
 % list_stop = listener_buttonbox('does_interrupt', true);
 
 % %Debugging at office initialization
-win = window('debug', 'rect', [1920,0,monitor_px+[1920,0]], 'bg_color', bg_color);
+%win = window('debug', 'rect', [1920,0,monitor_px+[1920,0]], 'bg_color', bg_color);
+win = window('debug', 'rect', [0,0,monitor_px+[0,0]], 'bg_color', bg_color);
 aud = local_audio_port('volume', aud_volume);
 list_wait = listener_keyboard;
 list_stop = listener_keyboard('does_interrupt', true);
@@ -243,6 +244,7 @@ try
         if n_block == 1 ||  mod(itrial,n_block)==1 % update contrast only every Nblockth trial
             c = choose_adaptive_sampling(sampling_struct,adaptiveType);
         end
+        results(itrial,10) = now;
         results(itrial,6) = c;
         iphase = randi(length(phase));
         results(itrial,5) = phase(iphase);
@@ -408,9 +410,9 @@ end
             fname = ['test' '_' num2str(typeTemporal) '_' sprintf('%.2f',f) '_' fileTimestamp '.mat'];
         end
         if exist('results','var')
-            save(fullfile(datadir, fname), 'sampling_struct','results');
+            save(fullfile(datadir, fname), 'sampling_struct','results','ProbandName');
         else
-            save(fullfile(datadir, fname), 'sampling_struct');
+            save(fullfile(datadir, fname), 'sampling_struct','ProbandName');
         end
         fprintf('Data saved in: %s\n', fname);
     end

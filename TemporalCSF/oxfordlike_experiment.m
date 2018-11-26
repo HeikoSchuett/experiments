@@ -226,7 +226,7 @@ sampling_struct.distance = distance;
 sampling_struct.typeTemporal = typeTemporal;
 try
     if ~exist('results','var')
-        results = [f,contrast,size0,NaN,NaN,NaN,NaN,NaN];
+        results = [f,contrast,size0,typeTemporal,NaN,NaN,NaN,NaN,NaN,NaN];
         results = repmat(results,Ntrials,1);
         firstTrial=1;
     else
@@ -242,20 +242,21 @@ try
         if n_block == 1 ||  mod(itrial,n_block)==1 % update contrast only every Nblockth trial
             c = choose_adaptive_sampling(sampling_struct,adaptiveType);
         end
-        results(itrial,6) = c;
+        results(itrial,11)=now;
+        results(itrial,7) = c;
         iphase = randi(length(phase));
-        results(itrial,5) = phase(iphase);
+        results(itrial,6) = phase(iphase);
         pos    = randi(2);
-        results(itrial,7) = pos;
+        results(itrial,8) = pos;
         response = trial(c,iphase,pos);
         % Save the responses
         [press, rt] = response.get_presses('first');
         if ~isnan(press)
-            results(itrial,8) = press;
-            results(itrial,9) = rt;
+            results(itrial,9) = press;
+            results(itrial,10) = rt;
         else
-            results(itrial,8) = NaN;
             results(itrial,9) = NaN;
+            results(itrial,10) = NaN;
         end
         % update sampling_struct
         correct = press == pos;
@@ -266,7 +267,7 @@ try
         end
         if mod(itrial,n_feedback)==0
             save_data();
-            correct=results(:,7)==results(:,8);
+            correct=results(:,9)==results(:,8);
             n_correct_total=sum(correct);
             n_total=itrial;
             n_correct_last=sum(correct((itrial-n_feedback+1):itrial));
@@ -278,7 +279,7 @@ try
         
     end
     save_data();
-    correct=results(:,7)==results(:,8);
+    correct=results(:,9)==results(:,8);
     n_correct_total=sum(correct);
     n_total=itrial;
     win.pause_trial(list_stop,[num2str(itrial), ' trials passed out of ', num2str(size(results,1)),...

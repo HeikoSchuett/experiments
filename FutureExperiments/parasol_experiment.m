@@ -20,7 +20,10 @@ function sampling_struct=parasol_experiment(ProbandName,f,time,type,degSize,exce
 % Ntrials   total number of trials                        [#]
 % crt      optional: run on crt
 % use_eyetracker optional: turn on eye_tracker check
-
+% 
+% to convert to database format use:
+% convert_database('data','output.csv',{'frequency','temporal condition','detection condition','sizeX','sizeY','excentricity','test contrast','phase','true position','response','RT'})
+    
 addpath('adaptive_sampling')
 addpath(genpath('~/Dokumente/ishow'))
 
@@ -273,7 +276,7 @@ aud.create_beep('long_high' , 'high', .4, 0.25);
 % initialize sampling_struct for adaptive sampling
 sampling_struct = init_adaptive_sampling(0.1,[0.0005,0.75],'2AFC',options);
 try
-    results = [f,time,type,degSize,excentr,NaN,NaN,NaN,NaN,NaN]; % c, phase, position, position clicked,RT
+    results = [f,time,type,degSize,excentr,NaN,NaN,NaN,NaN,NaN,NaN]; % c, phase, position, position clicked,RT
     results = repmat(results,Ntrials,1);
     firstTrial=1;
     pause_trial
@@ -308,6 +311,7 @@ try
         elseif c>sampling_struct.last_stim*4
             c = sampling_struct.last_stim*4;
         end
+        results(itrial,12) = now;
         results(itrial,7) = c;
         iphase = randi(length(phase));
         results(itrial,8) = phase(iphase);

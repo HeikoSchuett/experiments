@@ -1,0 +1,12 @@
+subject; subject code
+session; number of the experimental session
+frequency; spatial frequency of the signal
+pedestal contrast; pedestal contrast in both intervals usually 0
+sizeX; size of the stimulus in dva x direction
+sizeY; size of the stimulus in dva x direction
+phase; phase relative to stimulus center
+test contrast; tested contrast level
+true position; which interval contained the signal: 1 or 2
+response; which interval was selected by the subject 1 or 2
+RT; reaction time
+datetime; when the trial was collected
