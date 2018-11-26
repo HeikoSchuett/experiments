@@ -1,11 +1,13 @@
 subject; subject code
 session; number of the experimental session
 frequency; spatial frequency of the signal
-pedestal contrast; pedestal contrast in both intervals usually 0
+temporal condition; which temporal envelope to use (1-7)
+detection condition; whether we did detection (1) or orientation discrimination (2)
 sizeX; size of the stimulus in dva x direction
-sizeY; size of the stimulus in dva x direction
-phase; phase relative to stimulus center
+sizeY; size of the stimulus in dva y direction
+eccentricity; distance from fixation point
 test contrast; tested contrast level
+phase; phase relative to stimulus center
 true position; which interval contained the signal: 1 or 2
 response; which interval was selected by the subject 1 or 2
 RT; reaction time
