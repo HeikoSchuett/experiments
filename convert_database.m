@@ -12,7 +12,7 @@ function convert_database(folder,filename,headers)
 %  subject -> first column, Name of the Subject extracted from the filename
 %  session -> increasing session number for each subject
 
-headers = [{'subject','session'},headers,{'datetime'}];
+headers = [{'subject','session'},headers,{'filename','datetime'}];
 
 files = dir(folder);
 files = files(~[files.isdir]);

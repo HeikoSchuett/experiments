@@ -10,4 +10,5 @@ test contrast; tested contrast level
 true position; which interval contained the signal: 1 or 2
 response; which interval was selected by the subject 1 or 2
 RT; reaction time
+filename; name of the original data file
 datetime; when the trial was collected
