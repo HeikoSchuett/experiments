@@ -1,5 +1,5 @@
-function sampling_struct=witch_experiment(ProbandName,f,typeTemporal,distance,Ntrials,n_block)
-% function sampling_struct=witch_experiment(ProbandName,f,typeTemporal,distance,Ntrials,n_block)
+function sampling_struct=witch_experiment(ProbandName,f,typeTemporal,distance,Ntrials,n_block,crt)
+% function sampling_struct=witch_experiment(ProbandName,f,typeTemporal,distance,Ntrials,n_block,crt)
 % this functions tries to closely reproduce the conditions in Baldwin &
 % Meese for the foveal presentation to allow calibration of the Retina
 % model
@@ -11,8 +11,13 @@ function sampling_struct=witch_experiment(ProbandName,f,typeTemporal,distance,Nt
 % distance     distance of the monitor                     [mm]
 % Ntrials      total number of trials                      [#]
 % n_block      number of trials with fixed stimulus intensity (default=1)
+% crt          shall I initialize datapixx (0, default) or crt (1)
 %
 % please check that framerate = 120hz!
+% the only really relevant typeTemporal here is 4, which was the condition
+% in the witch hat experiment by Baldwin & Meese
+
+
 
 bw = [1.6,25/180*pi];
 
@@ -46,6 +51,9 @@ if ~exist('n_block','var') || isempty(n_block)
     n_block = 1;
 end
 
+if ~exist('crt','var') || isempty(crt)
+    crt = 0;
+end
 
 
 
@@ -159,20 +167,19 @@ clut(1:10)  = 0;
 clut(clut<0)= 0;
 
 %% start hardware
-
-% CRT-initialization
-win = window('crt_gray', 'bg_color', bg_color, 'clut', clut);
-aud = dpixx_audio_port('volume', aud_volume);
-list_wait = listener_buttonbox;
-list_stop = listener_buttonbox('does_interrupt', true);
-
-%
-% %Datapixx-initialization:
-% win = window('lcd_gray', 'bg_color', bg_color, 'clut', clut);
-% aud = dpixx_audio_port('volume', aud_volume);
-% list_wait = listener_buttonbox;
-% list_stop = listener_buttonbox('does_interrupt', true);
-
+if crt
+    % CRT-initialization
+    win = window('crt_gray', 'bg_color', bg_color, 'clut', clut);
+    aud = dpixx_audio_port('volume', aud_volume);
+    list_wait = listener_buttonbox;
+    list_stop = listener_buttonbox('does_interrupt', true);
+else
+    %Datapixx-initialization:
+    win = window('lcd_gray', 'bg_color', bg_color, 'clut', clut);
+    aud = dpixx_audio_port('volume', aud_volume);
+    list_wait = listener_buttonbox;
+    list_stop = listener_buttonbox('does_interrupt', true);
+end
 % %Debugging at office initialization
 % win = window('debug', 'rect', [0 0 1000 1000], 'bg_color', bg_color);
 % aud = local_audio_port('volume', aud_volume);
