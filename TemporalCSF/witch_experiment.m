@@ -203,6 +203,7 @@ d2 = 0.2; % diameter of inner circle (degrees)
 % generate fixed grating texture
 grating0 = image_logGaborOrth(size0px,size0,f,1,size0/2,pi/2,1,bw,0)-1;
 texGrat0 = win.make_texture(grating0);
+texGratMinus = win.make_texture(-grating0);
 
 cross_grate0 = patch_crosshair('size', size0px, ...
     'length', 20, 'color', 0,'thickness',sizeCross);
@@ -314,7 +315,11 @@ end
         for itic = 1 : length(timecourse)
             if trial_valid
                 if pos == 1 % first is target
-                    win.draw_additive(texGrat0, michelson_to_scale(c,bg_color) * timecourse(itic),[pos0,pos0+size1px]);
+                    if michelson_to_scale(c,bg_color) * timecourse(itic)>0
+                        win.draw_additive(texGrat0, michelson_to_scale(c,bg_color) * timecourse(itic),[pos0,pos0+size1px]);
+                    else
+                        win.draw_additive(texGratMinus, -michelson_to_scale(c,bg_color) * timecourse(itic),[pos0,pos0+size1px]);
+                    end
                     win.draw(cross_tex0,1,[pos0-sizeCross,pos0+size0cross]);
                 else
                     win.draw(cross_tex0,1,[pos0-sizeCross,pos0+size0cross]);
@@ -335,7 +340,11 @@ end
         for itic = 1 : length(timecourse)
             if trial_valid
                 if pos == 2 % second is target
-                    win.draw_additive(texGrat0, michelson_to_scale(c,bg_color) * timecourse(itic),[pos0,pos0+size1px]);
+                    if michelson_to_scale(c,bg_color) * timecourse(itic)>0
+                        win.draw_additive(texGrat0, michelson_to_scale(c,bg_color) * timecourse(itic),[pos0,pos0+size1px]);
+                    else
+                        win.draw_additive(texGratMinus, -michelson_to_scale(c,bg_color) * timecourse(itic),[pos0,pos0+size1px]);
+                    end
                     win.draw(cross_tex0,1,[pos0-sizeCross,pos0+size0cross]);
                 else
                     win.draw(cross_tex0,1,[pos0-sizeCross,pos0+size0cross]);

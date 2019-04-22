@@ -12,7 +12,7 @@ function sampling_struct=temporal_experimentOffice(ProbandName,f,typeTemporal,di
 % n_block      number of trials with fixed stimulus intensity (default=1)
 %
 % please check that framerate = 120hz!
- 
+
 
 rng('shuffle');
 %% parse input
@@ -192,9 +192,8 @@ d2 = 0.2; % diameter of inner circle (degrees)
 % generate fixed grating texture
 for iphase = 1:length(phase)
     grating0 = grating_sine('size',size0px,'frequency',f.*size0(1),'phase',phase(iphase),'theta',theta0);
-    texGrat0(iphase) = win.make_texture(grating0);
-    grating1 = grating_sine('size',size1px,'frequency',f.*size1(1),'phase',phase(iphase),'theta',theta1);
-    texGrat1(iphase) = win.make_texture(grating1);
+    texGrat0(iphase,1) = win.make_texture(grating0);
+    texGrat0(iphase,2) = win.make_texture(-grating0);
 end
 
 cross_grate0 = patch_crosshair('size', size0px, ...
@@ -322,11 +321,19 @@ end
         for itic = 1 : length(timecourse)
             if trial_valid
                 if pos == 1 % first is target
-                    win.draw_additive(texGrat0(iphase), michelson_to_scale(c+contrast,bg_color) * timecourse(itic),[pos0,pos0+size1px]);
+                    if timecourse(itic)>=0
+                        win.draw_additive(texGrat0(iphase,1), michelson_to_scale(c+contrast,bg_color) * timecourse(itic),[pos0,pos0+size1px]);
+                    else
+                        win.draw_additive(texGrat0(iphase,2), -michelson_to_scale(c+contrast,bg_color) * timecourse(itic),[pos0,pos0+size1px]);
+                    end
                     win.draw_mask(window_tex0,[pos0,pos0+size1px]);
                     win.draw(cross_tex0,1,[pos0-sizeCross,pos0+size0cross]);
                 else
-                    win.draw_additive(texGrat0(iphase), michelson_to_scale(contrast,bg_color) * timecourse(itic),[pos0,pos0+size0px]);
+                    if timecourse(itic)>=0
+                        win.draw_additive(texGrat0(iphase,1), michelson_to_scale(contrast,bg_color) * timecourse(itic),[pos0,pos0+size0px]);
+                    else
+                        win.draw_additive(texGrat0(iphase,2), -michelson_to_scale(contrast,bg_color) * timecourse(itic),[pos0,pos0+size0px]);
+                    end
                     win.draw_mask(window_tex0,[pos0,pos0+size0px]);
                     win.draw(cross_tex0,1,[pos0-sizeCross,pos0+size0cross]);
                 end
@@ -346,11 +353,19 @@ end
         for itic = 1 : length(timecourse)
             if trial_valid
                 if pos == 2 % second is target
-                    win.draw_additive(texGrat0(iphase), michelson_to_scale(c+contrast,bg_color) * timecourse(itic),[pos0,pos0+size1px]);
+                    if timecourse(itic)>0
+                        win.draw_additive(texGrat0(iphase,1), michelson_to_scale(c+contrast,bg_color) * timecourse(itic),[pos0,pos0+size1px]);
+                    else
+                        win.draw_additive(texGrat0(iphase,2), -michelson_to_scale(c+contrast,bg_color) * timecourse(itic),[pos0,pos0+size1px]);
+                    end
                     win.draw_mask(window_tex0,[pos0,pos0+size1px]);
                     win.draw(cross_tex0,1,[pos0-sizeCross,pos0+size0cross]);
                 else
-                    win.draw_additive(texGrat0(iphase), michelson_to_scale(contrast,bg_color) * timecourse(itic),[pos0,pos0+size0px]);
+                    if timecourse(itic)>0
+                        win.draw_additive(texGrat0(iphase,1), michelson_to_scale(contrast,bg_color) * timecourse(itic),[pos0,pos0+size0px]);
+                    else
+                        win.draw_additive(texGrat0(iphase,2), -michelson_to_scale(contrast,bg_color) * timecourse(itic),[pos0,pos0+size0px]);
+                    end
                     win.draw_mask(window_tex0,[pos0,pos0+size0px]);
                     win.draw(cross_tex0,1,[pos0-sizeCross,pos0+size0cross]);
                 end
