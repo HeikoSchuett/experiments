@@ -250,8 +250,10 @@ for iphase = 1:length(phase)
     else
         gratingWrong = grating_sine('size',sizepx,'frequency',f.*degSize(1),'phase',phase(iphase),'theta',theta0-pi/8);
     end
-    texGrat(iphase) = win.make_texture(grating);
-    texGratWrong(iphase) = win.make_texture(gratingWrong);
+    texGrat(iphase,1) = win.make_texture(grating);
+    texGrat(iphase,2) = win.make_texture(-grating);
+    texGratWrong(iphase,1) = win.make_texture(gratingWrong);
+    texGratWrong(iphase,2) = win.make_texture(-gratingWrong);
 end
 
 cross_grate = patch_crosshair('size', sizepx, ...
@@ -414,16 +416,26 @@ wrap_up();
         for itic = 1 : length(timecourse)
             if trial_valid
                 if pos == 2 % right is correct
-                    win.draw_additive(texGratWrong(iphase), c * timecourse(itic),[posleft,posleft+sizepx]);
+                    if c * timecourse(itic)>0
+                        win.draw_additive(texGratWrong(iphase,1), c * timecourse(itic),[posleft,posleft+sizepx]);
+                        win.draw_additive(texGrat(iphase,1), c * timecourse(itic),[posright,posright+sizepx]);
+                    else
+                        win.draw_additive(texGratWrong(iphase,2), -c * timecourse(itic),[posleft,posleft+sizepx]);
+                        win.draw_additive(texGrat(iphase,2), -c * timecourse(itic),[posright,posright+sizepx]);
+                    end
                     win.draw_mask(window_tex,[posleft,posleft+sizepx]);
-                    win.draw_additive(texGrat(iphase), c * timecourse(itic),[posright,posright+sizepx]);
                     win.draw_mask(window_tex,[posright,posright+sizepx]);
                     win.draw(cross_tex,1,[posleft-sizeCross,posleft+size0cross]);
                     win.draw(cross_tex,1,[posright-sizeCross,posright+size0cross]);
                 else
-                    win.draw_additive(texGratWrong(iphase), c * timecourse(itic),[posright,posright+sizepx]);
+                    if c * timecourse(itic)>0
+                        win.draw_additive(texGratWrong(iphase,1), c * timecourse(itic),[posright,posright+sizepx]);
+                        win.draw_additive(texGrat(iphase,1), c * timecourse(itic),[posleft,posleft+sizepx]);
+                    else
+                        win.draw_additive(texGratWrong(iphase,2), -c * timecourse(itic),[posright,posright+sizepx]);
+                        win.draw_additive(texGrat(iphase,2), -c * timecourse(itic),[posleft,posleft+sizepx]);
+                    end
                     win.draw_mask(window_tex,[posright,posright+sizepx]);
-                    win.draw_additive(texGrat(iphase), c * timecourse(itic),[posleft,posleft+sizepx]);
                     win.draw_mask(window_tex,[posleft,posleft+sizepx]);
                     win.draw(cross_tex,1,[posright-sizeCross,posright+size0cross]);
                     win.draw(cross_tex,1,[posleft-sizeCross,posleft+size0cross]);
