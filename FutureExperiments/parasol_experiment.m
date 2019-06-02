@@ -307,6 +307,10 @@ try
         end
     end
     for itrial = firstTrial:Ntrials
+        [~, ~, keyCode] = KbCheck();
+        if keyCode(KbName('q'))
+            error('Experiment ended by q press')
+        end
         c = choose_adaptive_sampling(sampling_struct,adaptiveType);
         if c < sampling_struct.last_stim/4
             c = sampling_struct.last_stim/4;
@@ -585,6 +589,7 @@ wrap_up();
             clear win
         catch
             Screen('CloseAll')
+            ListenChar(0);
         end
         %         plot_experiment(results);
         %         disp('   contrast, Ncorrect,    N');
