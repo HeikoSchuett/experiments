@@ -48,10 +48,10 @@ if crt
     monitor_px    = [1600,1200]; % px
     monitor_mm    = [400,300];   % mm
 else
-    % VPIXX
+    % VPIXX2
     dist_monitor  = 1350;        % mm
-    monitor_px    = [1920,1200]; % px
-    monitor_mm    = [484,302];   % mm
+    monitor_px    = [1920,1080]; % px
+    monitor_mm    = [534,301];   % mm
 end
 % office
 % dist_monitor  = 1000;        % mm
@@ -75,7 +75,8 @@ phase         = linspace(0,(1-1/nphase),nphase);
 
 
 % saving config
-datadir       = '/home/data/heiko/parasol';
+%datadir       = '/home/data/heiko/parasol';
+datadir       = '/home/wiebke/results';
 %datadir       = '/home/heiko/MATLAB/test';
 fileTimestamp = standard_now;
 eye_data_path = fullfile(datadir, '/eye_data_files/');
@@ -88,6 +89,7 @@ options.sigmoidName = 'Weibull';
 adaptiveType  = 1;
 %% eyeTracker
 maxFixDist = 1; %deg
+eye_used = 1;
 
 % calculated values
 monitor_deg(1)= atan2(monitor_mm(1),dist_monitor)*180/pi;
@@ -133,7 +135,7 @@ end
 if crt
     calib = load('/home/data/calibration/crt_gray/crt_gray2018_03_13_1620.mat');
 else
-    calib = load('/home/data/calibration/lcd_gray/lcd_gray2018_03_13_1620.mat');
+    calib = load('/home/data/calibration/lcd_gray/lcd_gray2019_04_29_1105.mat');
 end
 clut = spline(calib.measurement, calib.input, linspace(0,1,(2^14))');
 clut(1:10)  = 0;
@@ -173,13 +175,11 @@ edf_file_remote = strcat('s_',ProbandName(1:3),'_', num2str(session), '.edf');
 %
 
 
-
-
 %% start eyetracker
 if use_eyetracker
     % initialise eyetracker
     try
-        Eyelink('SetAddress','134.2.202.185');
+        Eyelink('SetAddress','192.168.178.101');
         
         % Provide Eyelink with details about the graphics environment
         % and perform some initializations. The information is returned
@@ -197,7 +197,6 @@ if use_eyetracker
         % make sure that we get gaze data from the Eyelink
         Eyelink('Command', 'link_sample_data = LEFT,RIGHT,GAZE,AREA');
         
-        eye_used = -1;
     catch eyelink_error
         % Shutdown Eyelink:
         Eyelink('Shutdown');
@@ -390,7 +389,7 @@ wrap_up();
         % frequency dependence removed-> only one frequency, instead phase
         % added
         
-        %pause_trial % start the trial only when subject presses a button.
+        pause_trial % start the trial only when subject presses a button.
         
         if use_eyetracker
             % start recording eye position
@@ -515,7 +514,7 @@ wrap_up();
                 % if we do, get current gaze position from sample
                 x = mean(evt.gx); % +1 as we're accessing MATLAB array
                 y = mean(evt.gy);
-                
+
                 fixCheckX = abs(x-cx)./pxPerDeg(1);
                 fixCheckY = abs(y-cy)./pxPerDeg(2);
                 
@@ -529,10 +528,10 @@ wrap_up();
                 % if we do, get current gaze position from sample
                 x = evt.gx(eye_used+1); % +1 as we're accessing MATLAB array
                 y = evt.gy(eye_used+1);
-                
+            
                 fixCheckX = abs(x-cx)./pxPerDeg(1);
                 fixCheckY = abs(y-cy)./pxPerDeg(2);
-                
+
                 % do we have valid data and is the pupil visible?
                 if x~=el.MISSING_DATA && y~=el.MISSING_DATA && evt.pa(eye_used+1)>0
                     if sqrt(fixCheckX.^2 + fixCheckY.^2) > maxFixDist
