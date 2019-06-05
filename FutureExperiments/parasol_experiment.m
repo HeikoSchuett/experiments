@@ -89,7 +89,7 @@ options.sigmoidName = 'Weibull';
 adaptiveType  = 1;
 %% eyeTracker
 maxFixDist = 1; %deg
-eye_used = 1;
+eye_used = -1;
 
 % calculated values
 monitor_deg(1)= atan2(monitor_mm(1),dist_monitor)*180/pi;
