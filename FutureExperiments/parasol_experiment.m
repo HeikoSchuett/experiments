@@ -48,7 +48,7 @@ if crt
     monitor_px    = [1600,1200]; % px
     monitor_mm    = [400,300];   % mm
 else
-    % VPIXX2
+    % VPIXX
     dist_monitor  = 1350;        % mm
     monitor_px    = [1920,1080]; % px
     monitor_mm    = [534,301];   % mm
@@ -76,8 +76,8 @@ phase         = linspace(0,(1-1/nphase),nphase);
 
 % saving config
 %datadir       = '/home/data/heiko/parasol';
-datadir       = '/home/wiebke/results';
 %datadir       = '/home/heiko/MATLAB/test';
+datadir       = '/home/wiebke/results';
 fileTimestamp = standard_now;
 eye_data_path = fullfile(datadir, '/eye_data_files/');
 
@@ -128,8 +128,6 @@ switch time
         timecourse = timecourse.*cos(10*linspace(-pi,pi,nframes_stim)');
 end
 
-
-
 % calibration
 %linearization/calibration file
 if crt
@@ -152,7 +150,7 @@ else
     %
     %Datapixx-initialization:
     win = window('lcd_gray', 'bg_color', bg_color, 'clut', clut);
-    aud = dpixx_audio_port('volume', aud_volume);
+    aud = local_audio_port('volume', aud_volume);
     list_wait = listener_buttonbox;
     list_stop = listener_buttonbox('does_interrupt', true);
 end
@@ -173,6 +171,8 @@ end
 % the remote file is stored on MS-DOS, so has filename length restrictions:
 edf_file_remote = strcat('s_',ProbandName(1:3),'_', num2str(session), '.edf');
 %
+
+
 
 
 %% start eyetracker
@@ -196,7 +196,7 @@ if use_eyetracker
         
         % make sure that we get gaze data from the Eyelink
         Eyelink('Command', 'link_sample_data = LEFT,RIGHT,GAZE,AREA');
-        
+       
     catch eyelink_error
         % Shutdown Eyelink:
         Eyelink('Shutdown');
@@ -514,7 +514,7 @@ wrap_up();
                 % if we do, get current gaze position from sample
                 x = mean(evt.gx); % +1 as we're accessing MATLAB array
                 y = mean(evt.gy);
-
+                
                 fixCheckX = abs(x-cx)./pxPerDeg(1);
                 fixCheckY = abs(y-cy)./pxPerDeg(2);
                 
@@ -528,10 +528,10 @@ wrap_up();
                 % if we do, get current gaze position from sample
                 x = evt.gx(eye_used+1); % +1 as we're accessing MATLAB array
                 y = evt.gy(eye_used+1);
-            
+                
                 fixCheckX = abs(x-cx)./pxPerDeg(1);
                 fixCheckY = abs(y-cy)./pxPerDeg(2);
-
+                
                 % do we have valid data and is the pupil visible?
                 if x~=el.MISSING_DATA && y~=el.MISSING_DATA && evt.pa(eye_used+1)>0
                     if sqrt(fixCheckX.^2 + fixCheckY.^2) > maxFixDist
