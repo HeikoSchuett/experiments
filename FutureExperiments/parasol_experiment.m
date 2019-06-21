@@ -560,6 +560,8 @@ wrap_up();
     function wrap_up
         save_data
         try
+            PsychPortAudio('Stop', aud.h);
+            PsychPortAudio('Close', aud.h);
             if use_eyetracker
                 Eyelink('Command', 'clear_screen 0')
                 Eyelink('CloseFile');
