@@ -24,6 +24,8 @@ function sampling_struct=parasol_experiment(ProbandName,f,time,type,degSize,exce
 % to convert to database format use:
 % convert_database('data','output.csv',{'frequency','temporal condition','detection condition','sizeX','sizeY','excentricity','test contrast','phase','true position','response','RT'})
     
+PsychJavaTrouble()
+
 addpath('adaptive_sampling')
 addpath(genpath('~/Dokumente/ishow'))
 
@@ -89,6 +91,7 @@ options.sigmoidName = 'Weibull';
 adaptiveType  = 1;
 %% eyeTracker
 maxFixDist = 1; %deg
+% always track both eyes! elsewise this variable must be changed
 eye_used = -1;
 
 % calculated values
@@ -133,7 +136,7 @@ end
 if crt
     calib = load('/home/data/calibration/crt_gray/crt_gray2018_03_13_1620.mat');
 else
-    calib = load('/home/data/calibration/lcd_gray/lcd_gray2019_04_29_1105.mat');
+    calib = load('/home/data/calibration/lcd_gray/lcd_gray2019_07_14_1327.mat');
 end
 clut = spline(calib.measurement, calib.input, linspace(0,1,(2^14))');
 clut(1:10)  = 0;
@@ -150,7 +153,12 @@ else
     %
     %Datapixx-initialization:
     win = window('lcd_gray', 'bg_color', bg_color, 'clut', clut);
-    aud = local_audio_port('volume', aud_volume);
+    aud.h = PsychPortAudio('Open');
+    % charing pahandle of PsychPortAudio with Sound so that both have
+    % access to soundcard
+    Snd('Open',aud.h);
+    PsychPortAudio('Volume',aud.h,aud_volume);
+    aud.sample_rate = 9800;
     list_wait = listener_buttonbox;
     list_stop = listener_buttonbox('does_interrupt', true);
 end
@@ -266,11 +274,8 @@ window_tex = win.make_mask_texture('tapered_cosine', ...
     'alpha', 0.2);
 
 %% Generate sounds
-aud.create_beep('short_low' , 'low' , 5/72, 0.25);
-aud.create_beep('short_med' , 'med' , 5/72, 0.25);
-aud.create_beep('short_high', 'high', .1, 0.25);
-aud.create_beep('long_low'  , 'low' , .4, 0.25);
-aud.create_beep('long_high' , 'high', .4, 0.25);
+aud_short_low = MakeBeep(220, 5/72);
+aud_short_high = MakeBeep(1000, .1);
 
 
 %% run experiment
@@ -374,12 +379,10 @@ catch e
     wrap_up();
     rethrow(e)
 end
-
 wrap_up();
 
 
 %% function definitions
-
 
 %% trial
     function response = trial(c,iphase, pos)
@@ -389,7 +392,7 @@ wrap_up();
         % frequency dependence removed-> only one frequency, instead phase
         % added
         
-        pause_trial % start the trial only when subject presses a button.
+        %pause_trial % start the trial only when subject presses a button.
         
         if use_eyetracker
             % start recording eye position
@@ -415,7 +418,8 @@ wrap_up();
         end
         
         % stimulus presentations
-        aud.play('short_low');
+        PsychPortAudio('FillBuffer', aud.h, [aud_short_low; aud_short_low]);
+        PsychPortAudio('Start', aud.h, 1, 0 , 1);
         for itic = 1 : length(timecourse)
             if trial_valid
                 if pos == 2 % right is correct
@@ -453,7 +457,8 @@ wrap_up();
             end
         end
         if trial_valid
-            aud.play('short_high');
+            PsychPortAudio('FillBuffer', aud.h, [aud_short_high; aud_short_high]);
+            PsychPortAudio('Start', aud.h, 1, 0 , 1);
             % Response interval
             list_wait.start();
             for itic = 1 : n_frames_resp
@@ -558,10 +563,12 @@ wrap_up();
 %% wrap up
 
     function wrap_up
+        
         save_data
         try
-            PsychPortAudio('Stop', aud.h);
-            PsychPortAudio('Close', aud.h);
+            PsychPortAudio('Stop',aud.h);
+            PsychPortAudio('Close',aud.h);
+
             if use_eyetracker
                 Eyelink('Command', 'clear_screen 0')
                 Eyelink('CloseFile');
